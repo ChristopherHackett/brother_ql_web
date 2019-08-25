@@ -59,11 +59,11 @@
               <input id="fontSize" class="form-control" type="number" min="1" value="{{ label['DEFAULT_FONT_SIZE'] }}" onChange="preview()" required>
               <label for="fontAlign" class="control-label input-group">Font Alignment:</label>
               <div class="btn-group" data-toggle="buttons">
-                  <label class="btn btn-default">
-                      <input type="radio" name="fontAlign" onchange="preview()" value="left" aria-label="Left Align"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
-                  </label>
                   <label class="btn btn-default active">
-                      <input type="radio" name="fontAlign" onchange="preview()" value="center" aria-label="Center Align" checked=""><span class="glyphicon glyphicon-align-center" aria-hidden="true"></span>
+                      <input type="radio" name="fontAlign" onchange="preview()" value="left" aria-label="Left Align" checked=""><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+                  </label>
+                  <label class="btn btn-default">
+                      <input type="radio" name="fontAlign" onchange="preview()" value="center" aria-label="Center Align"><span class="glyphicon glyphicon-align-center" aria-hidden="true"></span>
                   </label>
                   <label class="btn btn-default">
                       <input type="radio" name="fontAlign" onchange="preview()" value="right" aria-label="Right Align"><span class="glyphicon glyphicon-align-right" aria-hidden="true"></span>
@@ -109,7 +109,17 @@
       <fieldset class="form-group">
         <label for="labelText">Label Text:</label>
         <textarea rows="7" id="labelText" class="form-control" onChange="preview()" onInput="preview()"></textarea>
+       <div class="btn-group" data-toggle="buttons">
+               <button type="button" class="btn btn-default" name="clear" onclick="clearText()" aria-label="Clear Text">
+                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                 Clear
+               </button>
+       </div>
       </fieldset>
+      <div class="btn-group" data-toggle="buttons">
+      <button type="button" class="btn btn-default" name="changeWords" onclick="autoFormat()" aria-label="Right Align"><span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>Auto Format</button>
+      <button type="button" class="btn btn-default" name="upperCase" onclick="upper()" aria-label="Upper Case"><span class="glyphicon glyphicon-text-size" aria-hidden="true"></span>UPPER Case</button>
+    </div>
     </div>
     <div class="col-md-4">
       <fieldset class="form-group">
@@ -139,6 +149,7 @@ function formData() {
   //var text = $('#labelText').val().replace(/\n/g, "%0A");
   var text = $('#labelText').val();
   if (text == '') text = ' ';
+  console.log( $('input[name=fontAlign]:checked').val())
   return {
     text:        text,
     font_family: $('#fontFamily option:selected').text(),
@@ -183,6 +194,37 @@ function setStatus(data) {
   else
     $('#statusPanel').html('<div id="statusBox" class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-alert"></i><span>Printing was unsuccessful:<br />'+data['message']+'</span></div>');
   $('#printButton').prop('disabled', false);
+}
+
+
+function clearText() {
+  $('#labelText').val("");
+  preview();
+}
+
+function upper() {
+  var upperText = $('#labelText').val().toUpperCase();
+  $('#labelText').val(upperText);
+  preview();
+}
+
+function autoFormat() {
+  var text = $('#labelText').val();
+
+  // Trim end white space
+  text = text.replace(/\s\s*$/gm, "");
+
+  // Abbreviate
+  text = text.replace(/road\n/gi, "RD\n")
+  text = text.replace(/street\n/gi, "ST\n")
+  text = text.replace(/avenue\n/gi, "AVE\n")
+
+  // Remove UK
+  text = text.replace(/\nunited kingdom$/gi, "")
+
+  $('#labelText').val(text);
+
+  upper();
 }
 
 function print() {
